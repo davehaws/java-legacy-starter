@@ -72,6 +72,10 @@ public class JobApplicant {
 	    "219099999", "078051120"
 	};
 	
+	private String[] invalidSsnAreas = new String[] {
+		"000", "666", "9"	
+	};
+	
 	private String zipCode;    
 	private String city;
 	private String state;
@@ -86,7 +90,7 @@ public class JobApplicant {
 	
 	
 	public String formatSsn() {
-		String area = ssn.substring(0,3);
+		String area = getSsnArea();
 		String group = ssn.substring(3,5);
 		String serial = ssn.substring(5);
 		
@@ -123,9 +127,22 @@ public class JobApplicant {
 	}
 
 	private boolean ssnHasInvalidArea() {
-		return "000".equals(ssn.substring(0,3)) || 
-			 "666".equals(ssn.substring(0,3)) ||
-			 "9".equals(ssn.substring(0,1));
+		String ssnArea = getSsnArea();
+		
+		for (String invalid : invalidSsnAreas) {
+			if (areaBeginsWithInvalidDigits(ssnArea, invalid)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean areaBeginsWithInvalidDigits(String ssnArea, String invalid) {
+		return ssnArea.indexOf(invalid) == 0;
+	}
+
+	private String getSsnArea() {
+		return ssn.substring(0,3);
 	}
 
 	private boolean ssnIsTooLong() {
