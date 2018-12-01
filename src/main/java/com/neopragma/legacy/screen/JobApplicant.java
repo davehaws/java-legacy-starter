@@ -91,12 +91,24 @@ public class JobApplicant {
 	
 	public String formatSsn() {
 		String area = getSsnArea();
-		String group = ssn.substring(3,5);
-		String serial = ssn.substring(5);
+		String group = getSsnGroup();
+		String serial = getSsnSerial();
 		
 		return area + "-" + group + "-" + serial;
 	}
 
+	private String getSsnArea() {
+		return ssn.substring(0,3);
+	}
+
+	private String getSsnGroup() {
+		return ssn.substring(3,5);
+	}
+
+	private String getSsnSerial() {
+		return ssn.substring(5);
+	}
+	
 	public int validateSsn() {
 		if ( ssnIsTooLong() ) {
 			return INVALID_SSN_LENGTH;
@@ -123,7 +135,7 @@ public class JobApplicant {
 	}
 
 	private boolean ssnHasInvalidSerial() {
-		return "0000".equals(ssn.substring(5));
+		return "0000".equals(getSsnSerial());
 	}
 
 	private boolean ssnHasInvalidArea() {
@@ -139,10 +151,6 @@ public class JobApplicant {
 
 	private boolean areaBeginsWithInvalidDigits(String ssnArea, String invalid) {
 		return ssnArea.indexOf(invalid) == 0;
-	}
-
-	private String getSsnArea() {
-		return ssn.substring(0,3);
 	}
 
 	private boolean ssnIsTooLong() {
