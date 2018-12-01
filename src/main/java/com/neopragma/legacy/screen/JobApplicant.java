@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -19,6 +20,10 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class JobApplicant {
 	
+	private static final int INVALID_SSN_SPECIAL_CASE = 4;
+	private static final int INVALID_SSN_SERIAL = 3;
+	private static final int INVALID_SSN_GROUP = 2;
+	private static final int INVALID_SSN_LENGTH = 1;
 	private String firstName = null;
 	private String middleName = null;
 	private String lastName = null;
@@ -89,40 +94,47 @@ public class JobApplicant {
 	}
 
 	public int validateSsn() {
-		if ( !ssn.matches("\\d{9}") ) {
-			return 1;
+		if ( ssnIsTooLong() ) {
+			return INVALID_SSN_LENGTH;
 		}
-		if ( "000".equals(ssn.substring(0,3)) || 
-			 "666".equals(ssn.substring(0,3)) ||
-			 "9".equals(ssn.substring(0,1)) ) {
-			return 2;
+		if ( ssnHasInvalidArea() ) {
+			return INVALID_SSN_GROUP;
 		}
-		if ( "0000".equals(ssn.substring(5)) ) {
-			return 3;
+		if ( ssnHasInvalidSerial() ) {
+			return INVALID_SSN_SERIAL;
 		}
-		for (int i = 0 ; i < specialCases.length ; i++ ) {
-			if ( ssn.equals(specialCases[i]) ) {
-				return 4;
-			}
+		if ( ssnIsSpecialCase() ) {
+			return INVALID_SSN_SPECIAL_CASE;
 		}
 		return 0;
 	}
 
+	private boolean ssnIsSpecialCase() {
+		for (int i = 0 ; i < specialCases.length ; i++ ) {
+			if ( ssn.equals(specialCases[i]) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean ssnHasInvalidSerial() {
+		return "0000".equals(ssn.substring(5));
+	}
+
+	private boolean ssnHasInvalidArea() {
+		return "000".equals(ssn.substring(0,3)) || 
+			 "666".equals(ssn.substring(0,3)) ||
+			 "9".equals(ssn.substring(0,1));
+	}
+
+	private boolean ssnIsTooLong() {
+		return !ssn.matches("\\d{9}");
+	}
+
 	public void setZipCode(String zipCode) throws URISyntaxException, IOException {
 		this.zipCode = zipCode;
-		// Use a service to look up the city and state based on zip code.
-		// Save the returned city and state if content length is greater than zero.
-		URI uri = new URIBuilder()
-            .setScheme("http")
-            .setHost("www.zip-codes.com")
-            .setPath("/search.asp")
-            .setParameter("fld-zip", this.zipCode)
-            .setParameter("selectTab", "0")
-            .setParameter("srch-type", "city")
-            .build();
-        HttpGet request = new HttpGet(uri);
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpclient.execute(request);
+		CloseableHttpResponse response = getCityStateResponseFromZipCodeService();
         try {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -150,6 +162,22 @@ public class JobApplicant {
         } finally {
             response.close();
         }
+	}
+
+	private CloseableHttpResponse getCityStateResponseFromZipCodeService()
+			throws URISyntaxException, IOException, ClientProtocolException {
+		URI uri = new URIBuilder()
+            .setScheme("http")
+            .setHost("www.zip-codes.com")
+            .setPath("/search.asp")
+            .setParameter("fld-zip", this.zipCode)
+            .setParameter("selectTab", "0")
+            .setParameter("srch-type", "city")
+            .build();
+        HttpGet request = new HttpGet(uri);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpResponse response = httpclient.execute(request);
+		return response;
 	}
 
 	public String getCity() {
