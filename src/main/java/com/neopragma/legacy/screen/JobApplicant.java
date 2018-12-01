@@ -84,13 +84,13 @@ public class JobApplicant {
 		}    
 	}
 	
+	
 	public String formatSsn() {
-		StringBuilder sb = new StringBuilder(ssn.substring(0,3));
-		sb.append("-");
-		sb.append(ssn.substring(3,5));
-		sb.append("-");
-		sb.append(ssn.substring(5));
-		return sb.toString();
+		String area = ssn.substring(0,3);
+		String group = ssn.substring(3,5);
+		String serial = ssn.substring(5);
+		
+		return area + "-" + group + "-" + serial;
 	}
 
 	public int validateSsn() {
