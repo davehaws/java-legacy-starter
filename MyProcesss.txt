@@ -1,0 +1,35 @@
+When I am refactoring code, especially new code that I haven't seen, I follow a couple of
+steps, mostly following Kent Beck's rules of simple design:
+1. Make sure the tests are all passing
+2. Look for areas in the code that aren't very good at expressing intent and focus there. As examples:
+	2a. Pull out magic numbers
+	2b. Extract methods for sub routines within large functions to make them smaller
+	2c. Look for functions don't tell me what the function actually does and rename
+3. In general, make functions and classes smaller.
+
+So, with my exercise today, most of my initial checkins were pretty safe and done through the IDE. Since
+the IDE can refactor for me, why would I take the chance of messing it up. After each small change, I
+would validate the change. In most cases, I would also check in the change.
+
+Once I felt the intent of the original algorithms was clearer, I began pulling out functionality from the
+class itself. I tried to pick an area to pull and stick with that until I was done. So you will see I did
+that with ZipCode, SSN and ApplicantName. As I created new classes, I would create new test classes to
+mimic the code structure. I did pull over most of the test cases from the original to use as a test for for
+each of the new classes I was creating. I can only think of one test I added outside of the tests that were
+already there.
+
+A key to this whole exercise, though, was to refactor, not redesign. I know there are some debates around
+refactoring being a design exercise, but the difference I am making here is simply trying not to change
+or add any functionality. So if bugs were in the code before, the same bugs are still there. If there were
+holes in the tests, I didn't add them because it would force me to make choices on how to implement code
+without having a context to go from. However, when I did see blatant holes, I added TODOs to "come back later."
+
+Not a big fan of TODOs in general because we frequently don't come back later or the TODO get's lost in code
+change and the original intent gets lost. Anyway, I added them where I would go to a client and start the
+conversations around intent so that I didn't mess up following my own assumptions.
+
+Hopefully, that makes sense.
+
+Thanks! It was fun!
+
+Dave
