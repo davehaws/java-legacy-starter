@@ -20,8 +20,8 @@ public class ZipCode {
 	String city;
 	String state;
 
-	public ZipCode(String zip) throws URISyntaxException, IOException {
-		this.zip = zip;
+	public ZipCode(String zipCode) throws URISyntaxException, IOException {
+		zip = zipCode;
 		setCityState();
 	}
 
@@ -34,17 +34,21 @@ public class ZipCode {
 	}
 
 	public void setCityState() throws URISyntaxException, IOException {
-		String cityStateContent = getCityStateContentFromZipCode(zip);
+		String cityStateContent = getCityStateContentFromZipCodeService(zip);
         
         if (cityStateContent != null) {
-        	int cityIndex = getIndexOfCityInContent(cityStateContent);
-        	int cityEnd = cityStateContent.indexOf(" ", cityIndex);
-        	city = cityStateContent.substring(cityIndex, cityEnd);
-        	
-        	int stateIndex = cityEnd+1;
-        	int stateEnd = stateIndex+2;
-        	state = cityStateContent.substring(stateIndex, stateEnd);
+        	setCityStateFromServiceContent(cityStateContent);
         }
+	}
+
+	private void setCityStateFromServiceContent(String cityStateContent) {
+		int cityIndex = getIndexOfCityInContent(cityStateContent);
+		int cityEnd = cityStateContent.indexOf(" ", cityIndex);
+		city = cityStateContent.substring(cityIndex, cityEnd);
+		
+		int stateIndex = cityEnd+1;
+		int stateEnd = stateIndex+2;
+		state = cityStateContent.substring(stateIndex, stateEnd);
 	}
 
 	private static int getIndexOfCityInContent(String cityStateContent) {
@@ -58,10 +62,14 @@ public class ZipCode {
 		return currentOffset;
 	}
 
-	private static String getCityStateContentFromZipCode(String zip) throws URISyntaxException, IOException, ClientProtocolException {
+	private static String getCityStateContentFromZipCodeService(String zip) throws URISyntaxException, IOException, ClientProtocolException {
 		String cityStateContent = null;
 		
-		CloseableHttpResponse response = getZipCodeServiceResponse(zip);
+		URI uri = getURIForZipCodeService(zip);
+        HttpGet request = new HttpGet(uri);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpResponse response = httpclient.execute(request);
+
         try {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -83,15 +91,6 @@ public class ZipCode {
 			result.append(line);
 		}
 		return result.toString();
-	}
-
-	private static CloseableHttpResponse getZipCodeServiceResponse(String zip)
-			throws URISyntaxException, IOException, ClientProtocolException {
-		URI uri = getURIForZipCodeService(zip);
-        HttpGet request = new HttpGet(uri);
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpclient.execute(request);
-		return response;
 	}
 
 	private static URI getURIForZipCodeService(String zip) throws URISyntaxException {
