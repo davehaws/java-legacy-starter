@@ -11,30 +11,47 @@ public class SocialSecurityNumber {
 			"000", "666", "9"	
 		};	
 			
-	String area = "";
-	String group = "";
-	String serial = "";
+	private static String[] specialCases = new String[] {
+			"078051120", "219099999"
+		};	
+			
 	int state;
 	
 	public SocialSecurityNumber(String ssn) {
 		if ( ssn.matches("(\\d{3}-\\d{2}-\\d{4}|\\d{9})") ) {
   		    ssn = ssn.replaceAll("-", "");
   		    
-  		    area = ssn.substring(0, 3);
-  		    group = ssn.substring(3, 5);
-  		    serial = ssn.substring(5);
+  		    String area = ssn.substring(0, 3);
+  		    String group = ssn.substring(3, 5);
+  		    String serial = ssn.substring(5);
   		    
   		    if (areaIsInvalid(area)) {
   		    	state = INVALID_SSN_AREA;
+  		    }  else if (serialIsInvalid(serial)) {
+  		    	state = INVALID_SSN_SERIAL;
+  		    }  else if (numberIsSpecialCase(ssn)) {
+  		    	state = INVALID_SSN_SPECIAL_CASE;
   		    } else {
   	  		    state = VALID_SSN;
   		    }
 		} else {
-  		    ssn = "";
   		    state = INVALID_SSN_FORMAT;
 		}    
 	}
 
+	private static boolean numberIsSpecialCase(String number) {
+		for (String invalid : specialCases) {
+			if (number.equals(invalid)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean serialIsInvalid(String serial) {
+		return serial.equals("0000");
+	}
+	
 	private static boolean areaIsInvalid(String area) {
 		for (String invalid : invalidAreas) {
 			if (stringBeginsWith(area, invalid)) {
