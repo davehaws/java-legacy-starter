@@ -9,51 +9,29 @@ import java.util.Scanner;
  * Job applicant class.
  */
 public class JobApplicant {
-	
-	private String firstName = null;
-	private String middleName = null;
-	private String lastName = null;
-	
 	private SocialSecurityNumber ssn;
 	
-	private ZipCode zipCode;    
+	private ZipCode zipCode;
+	
+	private ApplicantName name;
 
 	public void setName(String firstName, String middleName, String lastName) {
-		this.firstName = firstName == null ? "" : firstName;
-		this.middleName = middleName == null ? "" : middleName;
-		this.lastName = lastName == null ? "" : lastName;
+		name = new ApplicantName();
+		name.setName(firstName, middleName, lastName);
 	}
 	
 	public void setSpanishName(String primerNombre, String segundoNombre,
 							   String primerApellido, String segundoApellido) {
-		this.firstName = primerNombre == null ? "" : primerNombre;
-		this.middleName = segundoNombre == null ? "" : segundoNombre;
-		if ( primerApellido != null ) {
-  		    StringBuilder sb = new StringBuilder(primerApellido);
-		    sb.append(segundoApellido == null ? null : " " + segundoApellido);
-		    this.lastName = sb.toString();
-		} else {
-			this.lastName = "";
-		}
+		name = new ApplicantName();
+		name.setSpanishName(primerNombre, segundoNombre, primerApellido, segundoApellido);
 	}
 	
 	public String formatLastNameFirst() {
-		StringBuilder sb = new StringBuilder(lastName);
-		sb.append(", ");
-		sb.append(firstName);
-		if ( middleName.length() > 0 ) {
-			sb.append(" ");
-			sb.append(middleName);
-		}
-		return sb.toString();
+		return name.formatLastNameFirst();
 	}
 	
 	public int validateName() {
-		if ( firstName.length() > 0 && lastName.length() > 0 ) {
-			return 0;
-		} else {
-			return 6;
-		}
+		return name.validateName();
 	}
 	
 	public void setSsn(String ssn) {
