@@ -20,24 +20,11 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class JobApplicant {
 	
-	private static final int INVALID_SSN_SPECIAL_CASE = 4;
-	private static final int INVALID_SSN_SERIAL = 3;
-	private static final int INVALID_SSN_AREA = 2;
-	private static final int INVALID_SSN_LENGTH = 1;
-
-	private String[] specialCases = new String[] {
-	    "219099999", "078051120"
-	};
-	
-	private String[] invalidSsnAreas = new String[] {
-		"000", "666", "9"	
-	};	
-	
 	private String firstName = null;
 	private String middleName = null;
 	private String lastName = null;
 	
-	private String ssn;
+	private SocialSecurityNumber ssn;
 
 	private String zipCode;    
 	private String city;
@@ -82,80 +69,15 @@ public class JobApplicant {
 	}
 	
 	public void setSsn(String ssn) {
-		if ( ssn.matches("(\\d{3}-\\d{2}-\\d{4}|\\d{9})") ) {
-  		    this.ssn = ssn.replaceAll("-", "");
-		} else {
-  		    this.ssn = "";
-		}    
+		this.ssn = new SocialSecurityNumber(ssn);
 	}
-	
 	
 	public String formatSsn() {
-		String area = getSsnArea();
-		String group = getSsnGroup();
-		String serial = getSsnSerial();
-		
-		return area + "-" + group + "-" + serial;
+		return ssn.toString();
 	}
 
-	private String getSsnArea() {
-		return ssn.substring(0,3);
-	}
-
-	private String getSsnGroup() {
-		return ssn.substring(3,5);
-	}
-
-	private String getSsnSerial() {
-		return ssn.substring(5);
-	}
-	
 	public int validateSsn() {
-		if ( ssnIsTooLong() ) {
-			return INVALID_SSN_LENGTH;
-		}
-		if ( ssnHasInvalidArea() ) {
-			return INVALID_SSN_AREA;
-		}
-		if ( ssnHasInvalidSerial() ) {
-			return INVALID_SSN_SERIAL;
-		}
-		if ( ssnIsSpecialCase() ) {
-			return INVALID_SSN_SPECIAL_CASE;
-		}
-		return 0;
-	}
-
-	private boolean ssnIsSpecialCase() {
-		for (int i = 0 ; i < specialCases.length ; i++ ) {
-			if ( ssn.equals(specialCases[i]) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean ssnHasInvalidSerial() {
-		return "0000".equals(getSsnSerial());
-	}
-
-	private boolean ssnHasInvalidArea() {
-		String ssnArea = getSsnArea();
-		
-		for (String invalid : invalidSsnAreas) {
-			if (areaBeginsWithInvalidDigits(ssnArea, invalid)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean areaBeginsWithInvalidDigits(String ssnArea, String invalid) {
-		return ssnArea.indexOf(invalid) == 0;
-	}
-
-	private boolean ssnIsTooLong() {
-		return !ssn.matches("\\d{9}");
+		return ssn.getSsnState();
 	}
 
 	public void setZipCode(String zipCode) throws URISyntaxException, IOException {

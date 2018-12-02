@@ -78,4 +78,10 @@ public class SocialSecurityNumberTest {
 		assertEquals(SocialSecurityNumber.VALID_SSN, ssn.getSsnState());
 	}
 
+	@Test
+	public void validSsnDisplaysCorrectly() {
+		SocialSecurityNumber ssn = new SocialSecurityNumber("123456789");
+		assertEquals("123-45-6789", ssn.toString());
+	}
+
 }
