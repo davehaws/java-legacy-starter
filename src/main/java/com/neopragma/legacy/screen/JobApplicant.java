@@ -24,10 +24,25 @@ public class JobApplicant {
 	private static final int INVALID_SSN_SERIAL = 3;
 	private static final int INVALID_SSN_GROUP = 2;
 	private static final int INVALID_SSN_LENGTH = 1;
+
+	private String[] specialCases = new String[] {
+	    "219099999", "078051120"
+	};
+	
+	private String[] invalidSsnAreas = new String[] {
+		"000", "666", "9"	
+	};	
+	
 	private String firstName = null;
 	private String middleName = null;
 	private String lastName = null;
 	
+	private String ssn;
+
+	private String zipCode;    
+	private String city;
+	private String state;
+
 	public void setName(String firstName, String middleName, String lastName) {
 		this.firstName = firstName == null ? "" : firstName;
 		this.middleName = middleName == null ? "" : middleName;
@@ -66,20 +81,6 @@ public class JobApplicant {
 		}
 	}
 	
-	private String ssn;
-	
-	private String[] specialCases = new String[] {
-	    "219099999", "078051120"
-	};
-	
-	private String[] invalidSsnAreas = new String[] {
-		"000", "666", "9"	
-	};
-	
-	private String zipCode;    
-	private String city;
-	private String state;
-
 	public void setSsn(String ssn) {
 		if ( ssn.matches("(\\d{3}-\\d{2}-\\d{4}|\\d{9})") ) {
   		    this.ssn = ssn.replaceAll("-", "");
@@ -163,16 +164,25 @@ public class JobApplicant {
 		String cityStateContent = getCityStateContentFromZipCode();
         
         if (cityStateContent != null) {
-            int metaOffset = cityStateContent.indexOf("<meta ");
-            int contentOffset = cityStateContent.indexOf(" content=\"Zip Code ", metaOffset);
-            contentOffset += 19;
-            contentOffset = cityStateContent.indexOf(" - ", contentOffset);
-            contentOffset += 3;
-            int stateOffset = cityStateContent.indexOf(" ", contentOffset);
-            city = cityStateContent.substring(contentOffset, stateOffset);
-            stateOffset += 1;
-            state = cityStateContent.substring(stateOffset, stateOffset+2);
+        	int cityIndex = getIndexOfCityInContent(cityStateContent);
+        	int cityEnd = cityStateContent.indexOf(" ", cityIndex);
+        	city = cityStateContent.substring(cityIndex, cityEnd);
+        	
+        	int stateIndex = cityEnd+1;
+        	int stateEnd = stateIndex+2;
+        	state = cityStateContent.substring(stateIndex, stateEnd);
         }
+	}
+
+	private int getIndexOfCityInContent(String cityStateContent) {
+		int currentOffset = 0;
+		String[] contentSections = new String[]{"<meta ", " content=\"Zip Code ", " - "};
+		
+		for (String section : contentSections) {
+			currentOffset = cityStateContent.indexOf(section, currentOffset);
+			currentOffset += section.length();
+		}
+		return currentOffset;
 	}
 
 	private String getCityStateContentFromZipCode() throws URISyntaxException, IOException, ClientProtocolException {
