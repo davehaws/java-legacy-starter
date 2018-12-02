@@ -74,33 +74,34 @@ public class JobApplicant {
 		System.out.println("Saving to database: " + formatLastNameFirst());
 	}
 	
+	private static String getLine(String message, Scanner scanner) {
+		System.out.println(message);
+		return scanner.nextLine();
+	}
+	
+	// TODO Will need to break this apart a bit so that we can test
+	//  - Will need to change some of the code here so that we can mock the istream rather than System.in
+	//  - Will also want to make the getLine calls allow for badly formatted input (request again rather than move on)
 	public static void main(String[] args) throws URISyntaxException, IOException {
 		JobApplicant jobApplicant = new JobApplicant();
 		boolean done = false;
 		Scanner scanner = new Scanner(System.in);
-		String firstName = "";
-		String middleName = "";
-		String lastName = "";
-		String ssn = "";
-		String zipCode = "";
 		while (!done) {
 			System.out.println("Please enter info about a job candidate or 'quit' to quit");
-			System.out.println("First name?");
-            firstName = scanner.nextLine();		
-            if (firstName.equals("quit")) {
+            String firstLine = getLine("First name?", scanner);		
+            if (firstLine.equals("quit")) {
             	scanner.close();
             	System.out.println("Bye-bye!");
             	done = true;
             	break;
             }
-			System.out.println("Middle name?");
-            middleName = scanner.nextLine();
-			System.out.println("Last name?");
-            lastName = scanner.nextLine();			
-			System.out.println("SSN?");
-            ssn = scanner.nextLine();			
-			System.out.println("Zip Code?");
-            zipCode = scanner.nextLine();			
+
+            String firstName = firstLine;
+            String middleName = getLine("Middle name?", scanner);
+            String lastName = getLine("Last name?", scanner);
+            String ssn = getLine("SSN?", scanner);
+            String zipCode = getLine("Zip Code?", scanner);
+
             jobApplicant.setName(firstName, middleName, lastName);          
             jobApplicant.setSsn(ssn);
             jobApplicant.setZipCode(zipCode);

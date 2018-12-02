@@ -1,7 +1,9 @@
 package com.neopragma.legacy.screen;
 
 public class ApplicantName {
-
+	// TODO
+	//   - Not all cases of null and empty string were being checked
+	//   - My goal was to refactor, not change behavior, but some work to do here eventually
 	public static final int VALID_NAME = 0;
 	public static final int INVALID_NAME = 6;
 	
