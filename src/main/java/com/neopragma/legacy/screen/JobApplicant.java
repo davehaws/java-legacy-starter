@@ -22,7 +22,7 @@ public class JobApplicant {
 	
 	private static final int INVALID_SSN_SPECIAL_CASE = 4;
 	private static final int INVALID_SSN_SERIAL = 3;
-	private static final int INVALID_SSN_GROUP = 2;
+	private static final int INVALID_SSN_AREA = 2;
 	private static final int INVALID_SSN_LENGTH = 1;
 
 	private String[] specialCases = new String[] {
@@ -115,7 +115,7 @@ public class JobApplicant {
 			return INVALID_SSN_LENGTH;
 		}
 		if ( ssnHasInvalidArea() ) {
-			return INVALID_SSN_GROUP;
+			return INVALID_SSN_AREA;
 		}
 		if ( ssnHasInvalidSerial() ) {
 			return INVALID_SSN_SERIAL;
