@@ -159,34 +159,47 @@ public class JobApplicant {
 
 	public void setZipCode(String zipCode) throws URISyntaxException, IOException {
 		this.zipCode = zipCode;
+		
+		String cityStateContent = getCityStateContentFromZipCode();
+        
+        if (cityStateContent != null) {
+            int metaOffset = cityStateContent.indexOf("<meta ");
+            int contentOffset = cityStateContent.indexOf(" content=\"Zip Code ", metaOffset);
+            contentOffset += 19;
+            contentOffset = cityStateContent.indexOf(" - ", contentOffset);
+            contentOffset += 3;
+            int stateOffset = cityStateContent.indexOf(" ", contentOffset);
+            city = cityStateContent.substring(contentOffset, stateOffset);
+            stateOffset += 1;
+            state = cityStateContent.substring(stateOffset, stateOffset+2);
+        }
+	}
+
+	private String getCityStateContentFromZipCode() throws URISyntaxException, IOException, ClientProtocolException {
+		String cityStateContent = null;
+		
 		CloseableHttpResponse response = getCityStateResponseFromZipCodeService();
         try {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                long len = entity.getContentLength();
-              	BufferedReader rd = new BufferedReader(
-                        new InputStreamReader(response.getEntity().getContent()));
-           		StringBuffer result = new StringBuffer();
-           		String line = "";
-           		while ((line = rd.readLine()) != null) {
-           			result.append(line);
-       		    }
-                int metaOffset = result.indexOf("<meta ");
-                int contentOffset = result.indexOf(" content=\"Zip Code ", metaOffset);
-                contentOffset += 19;
-                contentOffset = result.indexOf(" - ", contentOffset);
-                contentOffset += 3;
-                int stateOffset = result.indexOf(" ", contentOffset);
-                city = result.substring(contentOffset, stateOffset);
-                stateOffset += 1;
-                state = result.substring(stateOffset, stateOffset+2);
-            } else {
-            	city = "";
-            	state = "";
+                cityStateContent = getContentFromResponse(response, entity);
             }
         } finally {
             response.close();
         }
+		return cityStateContent;
+	}
+
+	private String getContentFromResponse(CloseableHttpResponse response, HttpEntity entity) throws IOException {
+		long len = entity.getContentLength();
+		BufferedReader rd = new BufferedReader(
+		        new InputStreamReader(response.getEntity().getContent()));
+		StringBuffer result = new StringBuffer();
+		String line = "";
+		while ((line = rd.readLine()) != null) {
+			result.append(line);
+		}
+		return result.toString();
 	}
 
 	private CloseableHttpResponse getCityStateResponseFromZipCodeService()

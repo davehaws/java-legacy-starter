@@ -28,7 +28,10 @@ public class JobApplicantTest {
 	public void beforeEach() {
 		jobApplicant = new JobApplicant();
 	}
-	
+
+	// TODO:
+	//    - Mock out the service so don't need to be online
+	//    - We have a bunch of code to handle zip code service errors, but no tests 
 	@Test
 	public void completeNameProvided() {
 		jobApplicant.setName("First", "Middle", "Last");
@@ -174,5 +177,4 @@ public class JobApplicantTest {
 		assertEquals("Marana", jobApplicant.getCity());
 		assertEquals("AZ", jobApplicant.getState());
 	}
-
 }
